@@ -11,7 +11,9 @@ const validator = require('validator');
 app.use(express.json());
 
 // Enable cors 
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:3000/","https://duple-task-app.onrender.com"]
+}));
 
 //Signup
 app.post('/signup',async(req,res)=>{
