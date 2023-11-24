@@ -4,16 +4,16 @@ const port = 5000;
 const connectDB = require('./db/dbConnect');
 const User = require('./db/user');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
-const validator = require('validator'); 
+const bcrypt = require('bcrypt'); //For Password hashing
+const validator = require('validator'); //it is used for to check the email (is it following the valid format)
 
-//Middleware for parsing JSON
+//middleware for parsing JSON
 app.use(express.json());
 
-// Enable cors 
+//enable cors 
 app.use(cors());
 
-//Signup
+//Signup Post Request
 app.post('/signup',async(req,res)=>{
     try{
         const{username,email,password} = req.body;
@@ -33,9 +33,11 @@ app.post('/signup',async(req,res)=>{
             password: hashedPassword,
         })
         
+        // Find Wheather the name and email Already Exists in DB 
         const UsernameExist = await User.findOne({ username });
         const EmailExist = await User.findOne({ email });
   
+        // Error Handling
         if (EmailExist && UsernameExist) {
             return res.status(401).json({
               error: 'Email and Username Already Exist. Please use different ones'
@@ -52,6 +54,7 @@ app.post('/signup',async(req,res)=>{
             });
         }
 
+        // Saving the user Credentials in the Database
         await user.save();
         return res.status(201).json({message: 'Registration Successfully. Please Sign In'})
     }
@@ -71,8 +74,11 @@ app.post('/', async (req, res) => {
       if (!user) {
         return res.status(401).json({ error: 'Email is Invalid. Please Check your Email again' });
       }
+
+      //Compare the Hash Password with the password entered by the user
       const isPasswordValid = await bcrypt.compare(password, user.password);
       
+      //If not valid
       if (!isPasswordValid) {
         return res.status(401).json({ error: 'Invalid Password' });
       }
@@ -84,9 +90,10 @@ app.post('/', async (req, res) => {
     }
 });
   
-
+// Connect to the database
 connectDB();
 
+// Listen the server
 app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
 });

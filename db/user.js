@@ -1,3 +1,4 @@
+// Creating Schema for storing user Credentials
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
